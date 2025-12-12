@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>✨ For My Universe — Cozy Corner Combined ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&family=Caveat:wght@400;700&family=Comfortaa:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    /* ----- Combined theme variables ----- */
+    :root{
+      --accent:#ff7b90; --accent-2:#ffb199; --muted:#4a4a4a; --white-opaque: rgba(255,255,255,0.96);
+      --glass: rgba(255,255,255,0.55); --radius:14px; --shadow:0 10px 40px rgba(17,17,17,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;min-height:100vh}
+    /* Put the animated gradient on both html and body and make it fixed so it always covers the page */
+    html{background: linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab); background-size:400% 400%; animation: gradientShift 18s ease infinite;}
+    body{
+      margin:0; font-family:'Poppins',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial; color:var(--muted);
+      background: transparent; /* inherit gradient from html */
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-y:auto;
+    }
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    /* Layout */
+    .wrap{max-width:1100px;margin:28px auto;padding:20px;position:relative;z-index:2;min-height:calc(100vh - 56px)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:white;font-weight:700;box-shadow:var(--shadow)}
+    .brand h1{font-family:'Caveat',cursive;margin:0;font-size:1.15rem;color:whitesmoke}
+
+    /* Welcome screen */
+    .welcome-screen{position:fixed;inset:0;background:radial-gradient(circle, rgba(238,119,82,0.95), rgba(231,60,126,0.95));display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.9s,transform 0.9s}
+    .welcome-screen.hidden{opacity:0;transform:scale(1.15);pointer-events:none}
+    .welcome-title{font-family:'Playfair Display',serif;color:white;font-size:3.2rem;text-shadow:0 0 30px rgba(255,255,255,0.5);margin-bottom:16px}
+    .enter-btn{padding:14px 36px;border-radius:999px;background:rgba(255,255,255,0.18);border:2px solid rgba(255,255,255,0.6);color:white;cursor:pointer;font-weight:700}
+
+    /* Header */
+    .main-header{text-align:center;padding:40px 20px;color:white}
+    .main-header h1{font-family:'Playfair Display',serif;font-size:2.6rem;margin-bottom:8px}
+    .main-header p{opacity:0.95}
+
+    /* Progress */
+    .progress-container{max-width:700px;margin:20px auto;background:rgba(255,255,255,0.06);backdrop-filter:blur(12px);border-radius:30px;padding:18px;border:1px solid rgba(255,255,255,0.08)}
+    .progress-bar{height:30px;background:rgba(255,255,255,0.08);border-radius:20px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,#fff,#ffd700);border-radius:20px;transition:width .6s;display:flex;align-items:center;justify-content:center;font-weight:700;color:#e73c7e}
+
+    /* Games Grid */
+    .games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px;margin:24px 0}
+    .game-card{background:linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.06));border-radius:20px;padding:22px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 12px 40px rgba(0,0,0,0.18);color:white}
+    .game-card.completed{background:linear-gradient(135deg,#ffd70033,#ffed4e33);border:2px solid #ffd700}
+    .game-title{font-size:1.4rem;margin-bottom:10px;font-weight:700}
+    .btn{padding:10px 22px;border-radius:20px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.18);cursor:pointer;color:white;font-weight:700}
+
+    /* Memory */
+    .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .memory-card{aspect-ratio:1;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;transition:transform .25s;color:white}
+    .memory-card.flipped{background:white;color:var(--accent)}
+    .memory-card.matched{background:linear-gradient(135deg,#ffd700,#ffed4e);color:#4a4a4a}
+
+    /* Treasure */
+    .treasure-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .treasure-box{aspect-ratio:1;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;color:white}
+    .treasure-box.found{background:linear-gradient(135deg,#ffd700,#ffed4e);color:#4a4a4a}
+    .treasure-box.empty{background:rgba(0,0,0,0.3);opacity:0.5}
+
+    /* Quiz */
+    .quiz-option{padding:12px;background:rgba(255,255,255,0.08);border-radius:12px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;margin-bottom:8px;color:white}
+    .quiz-option.correct{background:rgba(46,213,115,0.35);border-color:#2ed573;color:#063}
+    .quiz-option.wrong{background:rgba(255,71,87,0.35);border-color:#ff4757;color:#5a0000}
+
+    /* Rhythm */
+    .rhythm-display{font-size:2.5rem;height:100px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);border-radius:12px;margin-bottom:12px;color:white}
+    .rhythm-btn{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.10);border:3px solid rgba(255,255,255,0.12);cursor:pointer;font-size:1.6rem;color:white}
+
+    /* Note & Favorites area */
+    .side-area{display:grid;grid-template-columns:1fr;gap:18px;margin-top:20px}
+    .note-card{background:rgba(255,255,255,0.06);border-radius:12px;padding:16px;color:white;border:1px solid rgba(255,255,255,0.06)}
+    #loveNote{width:100%;min-height:120px;border-radius:8px;padding:12px;font-family:'Caveat',cursive;font-size:1.05rem;border:1px dashed rgba(255,255,255,0.08);resize:vertical;background:var(--white-opaque);color:#333}
+    .favorites-list{list-style:none;padding:0;margin:0}
+    .favorites-list li{background:rgba(255,255,255,0.06);padding:12px;border-radius:8px;margin-bottom:8px;border-left:5px solid var(--accent);color:white}
+
+    /* Letter overlay */
+    .letter-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:10000;padding:20px}
+    .letter-overlay.show{display:flex}
+    .letter-container{background:linear-gradient(135deg,#fff5f5,#ffe8e8);width:100%;max-width:720px;border-radius:20px;padding:34px;color:#4a4a4a;position:relative}
+    .letter-seal{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:72px;height:72px;background:linear-gradient(135deg,#ff6b6b,#feca57);border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:white}
+    .letter-title{font-family:'Playfair Display',serif;font-size:2rem;color:var(--accent);text-align:center;margin-bottom:12px}
+    .letter-content{line-height:1.7}
+
+    /* Stars */
+    .stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+    .star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;opacity:0.6}
+
+    @media(max-width:900px){.memory-grid{grid-template-columns:repeat(3,1fr)}.treasure-grid{grid-template-columns:repeat(5,1fr)}.game-card{padding:16px}}
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+
+  <!-- Welcome -->
+  <div class="welcome-screen" id="welcomeScreen" role="dialog" aria-modal="true">
+    <h1 class="welcome-title">&#10084;&#65039; Welcome to Our Universe &#10084;&#65039;</h1>
+    <p style="color:white;margin-bottom:20px">A magical journey awaits you...</p>
+    <button class="enter-btn" id="enterBtn">✨ Enter ✨</button>
+  </div>
+
+  <div class="wrap" id="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">&#x1F48C;</div>
+        <div>
+          <h1>Our Cozy Universe</h1>
+          <div style="font-size:0.9rem;color:rgba(255,255,255,0.9)">Private • Handcrafted</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn" id="composeLetterBtn">Compose Letter</button>
+        <button class="btn" id="exportNoteBtn">Export Note</button>
+      </div>
+    </div>
+
+    <div class="main-header">
+      <h1>✨ For My Beautiful Universe ✨</h1>
+      <p>Complete these magical challenges to unlock a surprise — everything stays private on this device.</p>
+    </div>
+
+    <div class="progress-container">
+      <div style="text-align:center;margin-bottom:12px;color:white;font-weight:700"><span id="progressText">0 / 4 Completed</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%">0%</div></div>
+    </div>
+
+    <div class="games-grid">
+      <div class="game-card" id="memoryCard">
+        <div class="game-title">💝 Memory of Love</div>
+        <p style="margin-bottom:10px;color:rgba(255,255,255,0.9)">Find all matching pairs</p>
+        <div class="memory-grid" id="memoryGrid" aria-live="polite"></div>
+        <div style="text-align:center;margin-top:12px"><button class="btn" id="memoryRestart">New Game</button></div>
+      </div>
+
+      <div class="game-card" id="treasureCard">
+        <div class="game-title">💎 Treasure Hunt</div>
+        <p style="margin-bottom:10px;color:rgba(255,255,255,0.9)">Find 6 hidden treasures! (<span id="treasureCount">0</span>/6)</p>
+        <div class="treasure-grid" id="treasureGrid" aria-live="polite"></div>
+      </div>
+
+      <div class="game-card" id="quizCard">
+        <div class="game-title">💭 Our Story Quiz</div>
+        <div class="quiz-question" id="quizQuestion" style="margin-bottom:12px;color:rgba(255,255,255,0.95)"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+      </div>
+
+      <div class="game-card" id="rhythmCard">
+        <div class="game-title">🎵 Love Rhythm</div>
+        <p style="margin-bottom:8px;color:rgba(255,255,255,0.9)">Match 10 patterns! Score: <span id="rhythmScore">0/10</span></p>
+        <div class="rhythm-display" id="rhythmDisplay">Ready?</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+          <button class="rhythm-btn" data-val="💖">&#128150;</button>
+          <button class="rhythm-btn" data-val="💕">&#128149;</button>
+          <button class="rhythm-btn" data-val="💝">&#128157;</button>
+        </div>
+        <div style="text-align:center;margin-top:12px"><button class="btn" id="rhythmStart">▶ Start</button></div>
+      </div>
+    </div>
+
+    <!-- Side area: note, favorites, gallery -->
+    <div class="side-area">
+      <div class="note-card">
+        <h3 style="margin-bottom:8px">💌 Your Private Note</h3>
+        <textarea id="loveNote" placeholder="Write a personal note here... (saves locally)"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+          <button class="btn" id="saveNoteBtn">Save</button>
+          <button class="btn" id="clearNoteBtn">Clear</button>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <h3 style="margin-bottom:8px">⭐ Our Favorites</h3>
+        <ul class="favorites-list" id="favoritesList">
+          <li><strong>Song:</strong> <span contenteditable id="favSong">[Our Song]</span></li>
+          <li><strong>Movie:</strong> <span contenteditable id="favMovie">[Our Movie]</span></li>
+          <li><strong>Spot:</strong> <span contenteditable id="favSpot">[Our Spot]</span></li>
+          <li><strong>Joke:</strong> <span contenteditable id="favJoke">[Our Joke]</span></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Letter overlay and editor -->
+  <div class="letter-overlay" id="letterOverlay" role="dialog" aria-modal="true">
+    <div class="letter-container">
+      <div class="letter-seal">&#x1F48C;</div>
+      <h2 class="letter-title">To My Dearest Love</h2>
+      <div class="letter-content" id="letterContent">
+        <p><strong>My Beautiful [Her Name],</strong></p>
+        <p>If I could capture every moment we've shared and turn them into stars, the entire night sky wouldn't be enough to hold the light you've brought into my life.</p>
+        <p>From the very first moment I saw you, something changed in me. The world suddenly became more colorful, more alive, more meaningful.</p>
+        <p class="letter-signature" style="text-align:right;margin-top:20px">Forever and Always Yours,<br><strong>[Your Name]</strong> ❤️</p>
+      </div>
+      <div style="text-align:right;margin-top:14px"><button class="btn" id="closeLetterBtn">Close</button></div>
+    </div>
+  </div>
+
+  <script>
+    // Defensive helpers
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+
+    // Stars
+    for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.opacity=(0.3+Math.random()*0.7).toFixed(2);s.style.transform='scale('+ (0.6+Math.random()*1.2) +')';document.getElementById('stars').appendChild(s)}
+
+    // Welcome
+    const welcomeScreen = $('#welcomeScreen'); const enterBtn = $('#enterBtn');
+    enterBtn && enterBtn.addEventListener('click', ()=>{ if(welcomeScreen){ welcomeScreen.classList.add('hidden'); setTimeout(()=>welcomeScreen.remove(),900); } });
+
+    // Progress logic
+    let completedCount = 0; const TOTAL = 4;
+    function updateProgress(){const p = Math.round((completedCount/TOTAL)*100); const pf = $('#progressFill'); if(pf){pf.style.width = p+'%'; pf.textContent = p+'%';} const pt = $('#progressText'); if(pt) pt.textContent = `${completedCount} / ${TOTAL} Completed`; if(completedCount>=TOTAL){setTimeout(()=>{const overlay = $('#letterOverlay'); if(overlay) overlay.classList.add('show');},1000)}}
+    function markComplete(id){const el = $('#'+id); if(!el) return; if(el.classList.contains('completed')) return; el.classList.add('completed'); completedCount++; updateProgress(); }
+
+    /* ---------------- Memory Game ---------------- */
+    const em = ['💖','🌹','💝','🌸','💕','🎀','💖','🌹','💝','🌸','💕','🎀'];
+    let memState = [], memFlipped = [], memMatched = 0;
+    function startMemory(){memMatched=0;memFlipped=[];memState = [...em].sort(()=>Math.random()-0.5); const grid = $('#memoryGrid'); if(!grid) return; grid.innerHTML=''; memState.forEach((sym,i)=>{ const card = document.createElement('div'); card.className='memory-card'; card.dataset.idx = i; card.textContent=''; card.addEventListener('click', ()=>{ onMemClick(i,card,sym)}); grid.appendChild(card); }); }
+    function onMemClick(i,card,sym){ const cards = $$('.memory-card'); const state = memState; if(memFlipped.includes(i) || card.classList.contains('matched') || memFlipped.length===2) return; card.classList.add('flipped'); card.textContent = sym; memFlipped.push(i); if(memFlipped.length===2){ setTimeout(()=>{ const [a,b]=memFlipped; if(state[a]===state[b]){ cards[a].classList.add('matched'); cards[b].classList.add('matched'); memMatched+=2; if(memMatched===state.length){ markComplete('memoryCard'); }} else { cards[a].classList.remove('flipped'); cards[b].classList.remove('flipped'); cards[a].textContent=''; cards[b].textContent=''; } memFlipped=[]; },600); } }
+    $('#memoryRestart') && $('#memoryRestart').addEventListener('click', startMemory);
+    startMemory();
+
+    /* ---------------- Treasure Hunt ---------------- */
+    const treGrid = $('#treasureGrid'); let treasureFound=0; function setupTreasure(){ if(!treGrid) return; treGrid.innerHTML=''; const arr = Array.from({length:25},(_,i)=>i<6); arr.sort(()=>Math.random()-0.5); treasureFound=0; $('#treasureCount') && ($('#treasureCount').textContent = treasureFound);
+      arr.forEach((has,i)=>{ const box = document.createElement('div'); box.className='treasure-box'; box.textContent='?'; box.addEventListener('click', ()=>{ if(box.classList.contains('found')||box.classList.contains('empty')) return; if(has){ box.classList.add('found'); box.textContent='💎'; treasureFound++; $('#treasureCount').textContent = treasureFound; if(treasureFound===6) markComplete('treasureCard'); } else { box.classList.add('empty'); box.textContent='✗'; } }); treGrid.appendChild(box); }); }
+    setupTreasure();
+
+    /* ---------------- Quiz ---------------- */
+    const quizData = [ {q:'What makes our love special?', o:['Every moment together','Your beautiful smile','The way we understand each other','All of the above 💕'], a:3}, {q:'My favorite thing about you?', o:['Your kindness','Your laugh','Your eyes','Everything ❤️'], a:3}, {q:'What do I promise you?', o:['To always support you','To make you smile','To love you forever','All of these 💖'], a:3} ];
+    let qIdx = 0; function loadQuiz(){ const q = quizData[qIdx]; if(!q) return; $('#quizQuestion').textContent = q.q; const opts = $('#quizOptions'); opts.innerHTML=''; q.o.forEach((opt,i)=>{ const d = document.createElement('div'); d.className='quiz-option'; d.textContent = opt; d.addEventListener('click', ()=>{ Array.from(opts.children).forEach(x=>x.style.pointerEvents='none'); if(i===q.a){ d.classList.add('correct'); setTimeout(()=>{ qIdx++; if(qIdx>=quizData.length){ markComplete('quizCard'); } else loadQuiz(); },900); } else { d.classList.add('wrong'); setTimeout(()=>{ opts.children[q.a] && opts.children[q.a].classList.add('correct'); },300); } }); opts.appendChild(d); }); }
+    loadQuiz();
+
+    /* ---------------- Rhythm ---------------- */
+    const patterns = [ ['💖'], ['💕'], ['💝'], ['💖','💕'], ['💕','💝'], ['💖','💝'], ['💖','💕','💝'], ['💝','💕','💖'], ['💖','💖','💕'], ['💝','💝','💝'] ];
+    let prIdx=0, prScore=0, prRunning=false, currentSeq=[];
+    function startRhythm(){ if(prRunning) return; prRunning=true; prIdx=0; prScore=0; $('#rhythmScore').textContent = '0/10'; showPattern(); }
+    function showPattern(){ if(prIdx>=10){ markComplete('rhythmCard'); prRunning=false; return; } currentSeq = patterns[prIdx].slice(); let i=0; const display = $('#rhythmDisplay'); display && (display.textContent=''); const interval = setInterval(()=>{ display.textContent = currentSeq[i]||''; i++; if(i>patterns[prIdx].length){ clearInterval(interval); display.textContent='Your turn!'; } },700); }
+    function checkRhythm(val){ if(!prRunning) return; if(currentSeq.length===0) return; const expected = currentSeq.shift(); const display = $('#rhythmDisplay'); if(expected===val){ display.textContent = '✓'; if(currentSeq.length===0){ prScore++; $('#rhythmScore').textContent = prScore+'/10'; prIdx++; setTimeout(showPattern,700); } } else { display.textContent = '✗'; currentSeq=[]; prIdx++; setTimeout(showPattern,700); } }
+    $('#rhythmStart') && $('#rhythmStart').addEventListener('click', startRhythm);
+    $$('.rhythm-btn').forEach(b=>b.addEventListener('click', ()=>checkRhythm(b.dataset.val)));
+
+    /* ---------------- Note + Favorites storage ---------------- */
+    const STORAGE = {note:'cozy_univ_note_v1', favs:'cozy_univ_favs_v1', letter:'cozy_univ_letter_v1'};
+    const loveNote = $('#loveNote'); const saveNoteBtn = $('#saveNoteBtn'); const clearNoteBtn = $('#clearNoteBtn');
+    // load
+    try{ const saved = localStorage.getItem(STORAGE.note); if(saved && loveNote) loveNote.value = saved; const favs = JSON.parse(localStorage.getItem(STORAGE.favs)||'{}'); if(favs.song) $('#favSong').textContent = favs.song; if(favs.movie) $('#favMovie').textContent = favs.movie; if(favs.spot) $('#favSpot').textContent = favs.spot; if(favs.joke) $('#favJoke').textContent = favs.joke; }catch(e){console.warn('load prefs',e)}
+    // save
+    function saveNote(){ if(!loveNote) return; localStorage.setItem(STORAGE.note, loveNote.value); alert('Note saved locally.'); }
+    saveNoteBtn && saveNoteBtn.addEventListener('click', saveNote);
+    clearNoteBtn && clearNoteBtn.addEventListener('click', ()=>{ if(confirm('Clear note?')){ if(loveNote) loveNote.value=''; localStorage.removeItem(STORAGE.note); } });
+    // favorites
+    const favEls = {song:$('#favSong'), movie:$('#favMovie'), spot:$('#favSpot'), joke:$('#favJoke')}; Object.values(favEls).forEach(el=>el && el.addEventListener('input', ()=>{const s=(favEls.song && favEls.song.textContent)||''; const m=(favEls.movie && favEls.movie.textContent)||''; const p=(favEls.spot && favEls.spot.textContent)||''; const j=(favEls.joke && favEls.joke.textContent)||''; localStorage.setItem(STORAGE.favs, JSON.stringify({song:s,movie:m,spot:p,joke:j})); }));
+
+    // Compose letter and overlay
+    const composeBtn = $('#composeLetterBtn'); const letterOverlay = $('#letterOverlay'); const closeLetterBtn = $('#closeLetterBtn');
+    composeBtn && composeBtn.addEventListener('click', ()=>{ const existing = localStorage.getItem(STORAGE.letter); if(existing){ if(confirm('A saved letter exists. Edit it now?')){ const text = prompt('Edit your letter:', existing); if(text!==null) { localStorage.setItem(STORAGE.letter, text); alert('Saved. It will show after completing all games.'); } } else { alert('Letter will display after finishing all games.'); } } else { const text = prompt('Compose your surprise letter. This will be private and saved locally:','Dear [Her Name],\n\nYou are...'); if(text!==null){ localStorage.setItem(STORAGE.letter, text); alert('Saved. It will show after finishing all games.'); } } });
+    closeLetterBtn && closeLetterBtn.addEventListener('click', ()=>{ letterOverlay.classList.remove('show'); });
+    // show stored letter when all games complete
+    (function(){ const origMark = markComplete; markComplete = function(id){ origMark(id); try{ const txt = localStorage.getItem(STORAGE.letter) || (loveNote && loveNote.value) || ''; if(txt && completedCount>=TOTAL){ const body = $('#letterContent'); if(body){ body.innerHTML = '<div style="white-space:pre-wrap">'+txt.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'; } letterOverlay.classList.add('show'); } }catch(e){console.warn(e)} }} )();
+
+    // export note button
+    $('#exportNoteBtn') && $('#exportNoteBtn').addEventListener('click', ()=>{ const text = (loveNote && loveNote.value) || ''; const blob = new Blob([text],{type:'text/plain'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='our-note.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+
+    // initial update
+    updateProgress();
+
+    console.log('Cozy-Universe combined fully debugged initialization complete.');
+  </script>
+</body>
+</html>

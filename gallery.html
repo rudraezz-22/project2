@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>📷 Our Moments — Cozy Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg1:#0b0810;--bg2:#241227;--glass:rgba(255,255,255,0.06);--accent:#ff7b9c;--muted:#f7e6ee}
+    *{box-sizing:border-box}html,body{height:100%;margin:0;font-family:'Montserrat',system-ui,Arial;color:var(--muted);background:radial-gradient(800px 420px at 18% 18%, rgba(255,120,160,0.04), transparent), linear-gradient(180deg,var(--bg1),var(--bg2));-webkit-font-smoothing:antialiased}
+
+    /* header */
+    .wrap{max-width:1200px;margin:28px auto;padding:24px;position:relative}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:62px;height:62px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ffd2e6);display:grid;place-items:center;color:#3a1020;font-weight:700;font-size:1.6rem}
+    h1{margin:0;font-family:'Caveat',cursive;font-size:1.6rem;color:var(--muted)}
+    .controls{display:flex;gap:10px;align-items:center}
+    .btn{padding:10px 14px;border-radius:999px;background:linear-gradient(90deg,var(--accent),#ffbfd6);border:0;color:#3a1020;font-weight:700;cursor:pointer}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+    /* hero */
+    .hero{display:flex;gap:18px;align-items:center;margin-top:18px}
+    .hero-left{flex:1}
+    .hero-title{font-family:'Caveat',cursive;font-size:2.2rem;margin:0;color:#ffdfee}
+    .hero-sub{opacity:0.9;color:#ffdfe8}
+
+    /* gallery grid - polaroid + parallax */
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-top:18px}
+    .polaroid{background:linear-gradient(180deg,#fff8fa,#fff2f6);border-radius:12px;padding:12px;box-shadow:0 30px 80px rgba(0,0,0,0.6);position:relative;cursor:grab;transition:transform .24s,box-shadow .24s}
+    .polaroid.dragging{opacity:0.6;transform:scale(0.98);cursor:grabbing}
+    .polaroid img{width:100%;height:180px;object-fit:cover;border-radius:8px;display:block}
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+    .caption{font-weight:600;color:#6b2030}
+    .meta .small{font-size:0.85rem;color:#8a3a50}
+
+    /* add photo area */
+    .uploader{margin-top:18px;padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));display:flex;gap:12px;align-items:center}
+    .fileinput{display:none}
+    .dropzone{flex:1;padding:12px;border-radius:10px;border:2px dashed rgba(255,255,255,0.06);text-align:center;color:#ffdfe8}
+    .dropzone.dragover{border-color:rgba(255,120,160,0.8);background:linear-gradient(180deg,rgba(255,120,160,0.02),transparent)}
+
+    /* lightbox */
+    .lightbox{position:fixed;inset:0;background:rgba(8,4,8,0.85);display:none;align-items:center;justify-content:center;z-index:9999}
+    .lightbox.show{display:flex}
+    .lb-content{max-width:90%;max-height:90%;display:flex;flex-direction:column;align-items:center}
+    .lb-img{max-width:100%;max-height:80vh;border-radius:10px;box-shadow:0 40px 120px rgba(0,0,0,0.8)}
+    .lb-bar{display:flex;gap:8px;align-items:center;margin-top:12px}
+    .icon-btn{padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,var(--accent),#ffbfd6);border:0;color:#3a1020;font-weight:700;cursor:pointer}
+
+    /* floating decorative moon */
+    .moon{position:fixed;right:6%;top:6%;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #ffdfe8, #ffb6d0);filter:blur(2px);opacity:0.9;box-shadow:0 40px 120px rgba(255,120,160,0.06)}
+
+    /* responsive */
+    @media(max-width:820px){.hero-title{font-size:1.6rem}.polaroid img{height:150px}}
+  </style>
+</head>
+<body>
+  <div class="moon" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">📷</div>
+        <div>
+          <h1>Our Moments</h1>
+          <div class="hero-sub">A private gallery — your photos live only on this device.</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn ghost" id="backBtn">← Back</button>
+        <label class="btn" for="fileInput">+ Add Photos</label>
+        <input id="fileInput" class="fileinput" type="file" accept="image/*" multiple />
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-left">
+        <h2 class="hero-title">Remembered in Light</h2>
+        <div class="hero-sub">Click any frame to open a dreamy lightbox. Drag to reorder your moments.</div>
+      </div>
+    </div>
+
+    <div class="uploader">
+      <div class="dropzone" id="dropzone">Drag & Drop photos here — or click “+ Add Photos”</div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <button class="btn" id="clearAll">Clear All</button>
+        <button class="btn ghost" id="exportAll">Export ZIP</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid" aria-live="polite"></div>
+
+  </div>
+
+  <!-- lightbox -->
+  <div class="lightbox" id="lightbox" aria-modal="true" role="dialog">
+    <div class="lb-content">
+      <img src="Screenshot 2025-12-12 141346.png" alt="" class="lb-img" id="lbImg">
+      <div class="lb-bar">
+        <button class="icon-btn" id="prevBtn">◀ Prev</button>
+        <button class="icon-btn" id="nextBtn">Next ▶</button>
+        <button class="icon-btn" id="downloadBtn">Download</button>
+        <button class="icon-btn ghost" id="deleteBtn">Delete</button>
+        <button class="icon-btn ghost" id="closeLb">Close ✕</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // gallery state stored in localStorage as array of dataURLs
+    const STORAGE_KEY = 'cozy_gallery_v1';
+    let images = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const grid = document.getElementById('grid');
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+
+    function render(){ grid.innerHTML=''; images.forEach((src, i)=>{
+      const card = document.createElement('div'); card.className='polaroid'; card.draggable = true; card.dataset.idx = i;
+      const img = document.createElement('img'); img.src = src; img.alt = 'Moment '+(i+1);
+      const meta = document.createElement('div'); meta.className='meta';
+      const cap = document.createElement('div'); cap.className='caption'; cap.textContent = 'Our Moment #'+(i+1);
+      const small = document.createElement('div'); small.className='small'; small.textContent = new Date().toLocaleDateString();
+      meta.appendChild(cap); meta.appendChild(small);
+      card.appendChild(img); card.appendChild(meta);
+
+      // click to open lightbox
+      card.addEventListener('click', (e)=>{ if(e.target.tagName.toLowerCase()==='button') return; openLightbox(i); });
+
+      // drag/drop reordering
+      card.addEventListener('dragstart', (e)=>{ card.classList.add('dragging'); e.dataTransfer.setData('text/plain', i); });
+      card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); save(); render(); });
+      card.addEventListener('dragover', (e)=>{ e.preventDefault(); const dragging = document.querySelector('.dragging'); if(!dragging) return; const from = Number(dragging.dataset.idx); const to = Number(card.dataset.idx); if(from===to) return; // swap
+        images.splice(to, 0, images.splice(from,1)[0]); render(); });
+
+      grid.appendChild(card);
+    }); }
+
+    function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(images)); }
+
+    // lightbox
+    const lightbox = document.getElementById('lightbox'); const lbImg = document.getElementById('lbImg'); let currentIndex = 0;
+    function openLightbox(idx){ currentIndex = idx; lbImg.src = images[idx]; lightbox.classList.add('show'); }
+    function closeLightbox(){ lightbox.classList.remove('show'); }
+    document.getElementById('closeLb').addEventListener('click', closeLightbox);
+    document.getElementById('prevBtn').addEventListener('click', ()=>{ if(images.length===0) return; currentIndex = (currentIndex-1+images.length)%images.length; lbImg.src = images[currentIndex]; });
+    document.getElementById('nextBtn').addEventListener('click', ()=>{ if(images.length===0) return; currentIndex = (currentIndex+1)%images.length; lbImg.src = images[currentIndex]; });
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{ if(!images[currentIndex]) return; const a=document.createElement('a'); a.href = images[currentIndex]; a.download = 'moment-'+(currentIndex+1)+'.png'; document.body.appendChild(a); a.click(); a.remove(); });
+    document.getElementById('deleteBtn').addEventListener('click', ()=>{ if(confirm('Delete this photo?')){ images.splice(currentIndex,1); save(); render(); closeLightbox(); } });
+
+    // file input
+    fileInput.addEventListener('change', async (e)=>{ const files = Array.from(e.target.files); await addFiles(files); fileInput.value=''; });
+
+    // drag & drop
+    ;['dragenter','dragover'].forEach(ev=>{ dropzone.addEventListener(ev,(e)=>{ e.preventDefault(); dropzone.classList.add('dragover'); })});
+    ;['dragleave','drop'].forEach(ev=>{ dropzone.addEventListener(ev,(e)=>{ e.preventDefault(); dropzone.classList.remove('dragover'); })});
+    dropzone.addEventListener('drop', async (e)=>{ const files = Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')); await addFiles(files); });
+
+    async function addFiles(files){ for(const f of files){ const data = await readFileAsDataURL(f); images.unshift(data); if(images.length>60) images = images.slice(0,60); } save(); render(); }
+    function readFileAsDataURL(file){ return new Promise((res, rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }) }
+
+    // clear and export
+    document.getElementById('clearAll').addEventListener('click', ()=>{ if(confirm('Clear all photos?')){ images=[]; save(); render(); } });
+
+    document.getElementById('exportAll').addEventListener('click', async ()=>{
+      if(images.length===0){ alert('No photos to export'); return; }
+      // simple ZIP creation using JSZip would be ideal but not available offline; provide a fallback: open images in new tabs
+      if(confirm('Export all images as separate tabs (you can save them manually)?')){
+        images.forEach((src,i)=>{ const w=window.open(); w.document.write('<img src="'+src+'" style="max-width:100%">'); });
+      }
+    });
+
+    // back button
+    document.getElementById('backBtn').addEventListener('click', ()=>{ window.location.href='index.html'; });
+
+    // keyboard navigation
+    document.addEventListener('keydown', (e)=>{ if(lightbox.classList.contains('show')){ if(e.key==='ArrowRight') document.getElementById('nextBtn').click(); if(e.key==='ArrowLeft') document.getElementById('prevBtn').click(); if(e.key==='Escape') closeLightbox(); } });
+
+    // initial render
+    render();
+
+    // small hint: if gallery empty, show sample images
+    if(images.length===0){ (async()=>{ const svgToDataUrl = (text)=> 'data:image/svg+xml;utf8,'+encodeURIComponent(text);
+        const samples = [ svgToDataUrl('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#fff7fb"/><text x="50%" y="50%" font-family="Caveat,cursive" font-size="48" fill="#6f2131" text-anchor="middle" dominant-baseline="middle">Add your first photo ❤️</text></svg>'), svgToDataUrl('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#fff2f6"/><text x="50%" y="50%" font-family="Caveat,cursive" font-size="36" fill="#6f2131" text-anchor="middle" dominant-baseline="middle">Drag & Drop to fill this gallery</text></svg>') ]; images = samples.concat(images); save(); render(); })(); }
+
+  </script>
+</body>
+</html>
