@@ -259,7 +259,7 @@
 
     // Compose letter and overlay
     const composeBtn = $('#composeLetterBtn'); const letterOverlay = $('#letterOverlay'); const closeLetterBtn = $('#closeLetterBtn');
-    composeBtn && composeBtn.addEventListener('click', ()=>{ const existing = localStorage.getItem(STORAGE.letter); if(existing){ if(confirm('A saved letter exists. Edit it now?')){ const text = prompt('Edit your letter:', existing); if(text!==null) { localStorage.setItem(STORAGE.letter, text); alert('Saved. It will show after completing all games.'); } } else { alert('Letter will display after finishing all games.'); } } else { const text = prompt('Compose your surprise letter. This will be private and saved locally:','Dear [Her Name],\n\nYou are...'); if(text!==null){ localStorage.setItem(STORAGE.letter, text); alert('Saved. It will show after finishing all games.'); } } });
+    composeBtn && composeBtn.addEventListener('click', ()=>{ const existing = localStorage.getItem(STORAGE.letter); if(existing){ if(confirm('A saved letter exists. Edit it now?')){ const text = prompt('Edit your letter:', existing); if(text!==null) { localStorage.setItem(STORAGE.letter, text); alert('Saved. It will show after completing all games.'); } } else { alert('Letter will display after finishing all games.'); } } else { const text = prompt('Compose your surprise letter. This will be private and saved locally:','Dear Khushee,\n\nYou are the only person I feel attached to. Whenever I talk to you happiness enters in my Life!'); if(text!==null){ localStorage.setItem(STORAGE.letter, text); alert('Saved. It will show after finishing all games.'); } } });
     closeLetterBtn && closeLetterBtn.addEventListener('click', ()=>{ letterOverlay.classList.remove('show'); });
     // show stored letter when all games complete
     (function(){ const origMark = markComplete; markComplete = function(id){ origMark(id); try{ const txt = localStorage.getItem(STORAGE.letter) || (loveNote && loveNote.value) || ''; if(txt && completedCount>=TOTAL){ const body = $('#letterContent'); if(body){ body.innerHTML = '<div style="white-space:pre-wrap">'+txt.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'; } letterOverlay.classList.add('show'); } }catch(e){console.warn(e)} }} )();
@@ -274,4 +274,5 @@
   </script>
 </body>
 </html>
+
 
